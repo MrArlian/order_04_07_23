@@ -38,7 +38,7 @@ async def revoke(message: types.Message, state: FSMContext):
     if entity is None:
         return await message.answer(texts.USER_NOT_FOUND)
 
-    if entity[0] < 0:
+    if entity[0] > 0:
         db.update_by_id(models.User, entity[0], privilege='default')
     else:
         db.update_by_id(models.Group, entity[0], privilege='default')

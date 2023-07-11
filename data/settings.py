@@ -3,3 +3,8 @@ ADMIN_KEYBOARD = [
     'забрать',
     'статистика'
 ]
+
+EXCLUDED_COMMANDS = [
+    'bay',
+    'admin'
+]

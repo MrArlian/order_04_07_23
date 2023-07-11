@@ -50,6 +50,10 @@ async def replenishment(message: types.Message, state: FSMContext):
 
     db.add(models.Replenishment, order_id=order_id, user_id=user_id, amount=float(text))
 
+    await message.answer(texts.PAYMENT_INFO.format(float(text), order_id), reply_markup=reply.remove)
     await message.answer(texts.PAYMENT, reply_markup=markup)
-    await message.delete_reply_markup()
+    await state.finish()
+
+async def cancel(message: types.Message, state: FSMContext):
+    await message.answer(texts.ACTION_CANCELED, reply_markup=reply.remove)
     await state.finish()

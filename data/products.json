@@ -3,7 +3,6 @@
         "name": "Default",
         "price": 0,
         "scope": [
-            "bay"
         ]
     },
     "test_1": {

@@ -17,19 +17,6 @@ Dispatcher.set_current(dispatcher)
 Bot.set_current(bot)
 
 
-from database import DataBase, models
-
-db =DataBase(Config.DATABASE_URL)
-
-entity = (
-    db.session.query(models.User.id).filter_by(id=0).union(
-        db.session.query(models.Group.id).filter_by(id=0)
-    )
-).first()
-
-print(entity)
-
-
 def main() -> None:
     from handlers.middleware import CheckPrivilege, CheckAdminRole
 
@@ -43,5 +30,4 @@ def main() -> None:
 
 
 if __name__ == '__main__':
-    # main()
-    pass
+    main()

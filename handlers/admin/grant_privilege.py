@@ -55,7 +55,7 @@ async def grant(message: types.Message, state: FSMContext):
     if text not in PRIVILEGES:
         return await message.answer(texts.PRIVILEGE_NOT_FOUND)
 
-    if entity < 0:
+    if entity > 0:
         db.update_by_id(models.User, entity, privilege=text)
     else:
         db.update_by_id(models.Group, entity, privilege=text)

@@ -11,8 +11,8 @@ async def bay_menu(event: typing.Union[types.Message, types.CallbackQuery],
                    callback_data: typing.Optional[dict] = None):
 
     if isinstance(event, types.CallbackQuery):
-        user_id = event.message.from_user.id
         chat_type = event.message.chat.type
+        user_id = event.from_user.id
     else:
         user_id = event.from_user.id
         chat_type = event.chat.type

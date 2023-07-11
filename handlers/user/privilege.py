@@ -34,11 +34,11 @@ async def view(callback: types.CallbackQuery, callback_data: dict):
 
     markup = types.InlineKeyboardMarkup(row_width=1)
     item1 = types.InlineKeyboardButton('Купить', callback_data=item1_callback_data)
-    item2 = types.InlineKeyboardButton('Назад', callback_data=callbacks.back_bay.new())
+    item2 = types.InlineKeyboardButton('Назад', callback_data=callbacks.back_bay.new(user_id))
     markup.add(item1, item2)
 
     msg = texts.PRIVILEGE_INFO.format(
-        privilege.get('name'), privilege.get('scope'), privilege.get('price')
+        privilege.get('name'), ', '.join(privilege.get('scope')), privilege.get('price')
     )
     await callback.message.edit_text(msg, reply_markup=markup)
 
@@ -64,6 +64,8 @@ async def purchase_type(callback: types.CallbackQuery, callback_data: dict):
             callback_data=callbacks.bay_privilege.new(name, 'public', user_id)
         )
     )
+
+    await callback.message.delete_reply_markup()
     await callback.message.answer(texts.PURCHASE_TYPE, reply_markup=markup)
 
 async def purchase(callback: types.CallbackQuery, callback_data: dict):
@@ -72,9 +74,10 @@ async def purchase(callback: types.CallbackQuery, callback_data: dict):
     _type = callback_data.get('type')
     name = callback_data.get('name')
 
+    chat_id = callback.message.chat.id
     user_id = callback.from_user.id
-    chat_id = callback.from_user.id
 
+    balance = db.get_data(models.User, columns=models.User.balance, default=0, id=user_id)
     privilege = PRIVILEGES.get(name)
 
 
@@ -82,6 +85,8 @@ async def purchase(callback: types.CallbackQuery, callback_data: dict):
         return
     if user_id != current_user:
         return await callback.answer(texts.ACTION_NOT_AVAILABLE, show_alert=True)
+    if balance < privilege.get('price'):
+        return await callback.answer(texts.INSUFFICIENT_FUNDS)
 
     db.update_by_id(models.User, user_id, balance=models.User.balance - privilege.get('price'))
 
