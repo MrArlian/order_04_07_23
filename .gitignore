@@ -5,8 +5,4 @@
 .config
 
 #Ignore other files
-data/user_statistic/*.csv
 data/*.tar
-
-#Ignore other folders
-data/system_logs/session-*
