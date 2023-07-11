@@ -1,0 +1,12 @@
+#Ignore pycache
+**/__pycache__
+
+#Ignore config folder
+.config
+
+#Ignore other files
+data/user_statistic/*.csv
+data/*.tar
+
+#Ignore other folders
+data/system_logs/session-*
