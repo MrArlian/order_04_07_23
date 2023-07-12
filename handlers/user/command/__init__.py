@@ -3,7 +3,7 @@ from aiogram.dispatcher import Dispatcher
 
 from keyboards import callbacks
 
-from . import about, start, today, bay
+from . import about, start, today, bay, kick
 
 
 dispatcher = Dispatcher.get_current()
@@ -22,3 +22,6 @@ dispatcher.register_message_handler(today.time, Command('time'))
 #bay.py
 dispatcher.register_callback_query_handler(bay.bay_menu, callbacks.back_bay.filter())
 dispatcher.register_message_handler(bay.bay_menu, Command('bay'))
+
+#kick.py
+dispatcher.register_message_handler(kick.kick_user, Command('kick'))
