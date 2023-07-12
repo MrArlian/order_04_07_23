@@ -7,4 +7,4 @@ async def date(message: types.Message):
     await message.answer(datetime.now().date())
 
 async def time(message: types.Message):
-    await message.answer(datetime.now().time())
+    await message.answer(datetime.now().time().strftime('%H:%M:%S'))

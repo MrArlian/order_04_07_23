@@ -5,4 +5,5 @@
 .config
 
 #Ignore other files
+data/products.json
 data/*.tar

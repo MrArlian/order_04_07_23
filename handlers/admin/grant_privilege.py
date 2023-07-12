@@ -15,7 +15,7 @@ db = DataBase(Config.DATABASE_URL)
 
 
 async def enter_user(message: types.Message):
-    await message.answer(texts.INPUT_USER, reply_markup=reply.cancel)
+    await message.answer(texts.INPUT_ENTITY, reply_markup=reply.cancel)
     await states.GrantPrivilege.user.set()
 
 async def enter_privilege(message: types.Message, state: FSMContext):
@@ -35,10 +35,10 @@ async def enter_privilege(message: types.Message, state: FSMContext):
             )
         ).first()
     else:
-        return await message.answer(texts.ERROR_INPUT_USER)
+        return await message.answer(texts.ERROR_INPUT_ENTITY)
 
     if entity is None:
-        return await message.answer(texts.USER_NOT_FOUND)
+        return await message.answer(texts.ENTITY_NOT_FOUND)
 
     await state.update_data(entity=entity[0])
     await message.answer(texts.INPUT_PRIVILEGE_NAME, reply_markup=reply.cancel)
@@ -53,7 +53,7 @@ async def grant(message: types.Message, state: FSMContext):
 
 
     if text not in PRIVILEGES:
-        return await message.answer(texts.PRIVILEGE_NOT_FOUND)
+        return await message.answer(texts.ADMIN_PRIVILEGE_NOT_FOUND)
 
     if entity > 0:
         db.update_by_id(models.User, entity, privilege=text)

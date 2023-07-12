@@ -33,6 +33,7 @@ async def replenishment(message: types.Message, state: FSMContext):
     if not tools.is_digit(text):
         return await message.answer(texts.INPUT_ERROR)
 
+    amount = float(text)
     payment = Payment.create({
         'amount': {
             'value': str(text),
@@ -48,9 +49,9 @@ async def replenishment(message: types.Message, state: FSMContext):
     item = types.InlineKeyboardButton('Оплатить', url=payment.confirmation.confirmation_url)
     markup.add(item)
 
-    db.add(models.Replenishment, order_id=order_id, user_id=user_id, amount=float(text))
+    db.add(models.Replenishment, order_id=order_id, user_id=user_id, amount=amount)
 
-    await message.answer(texts.PAYMENT_INFO.format(float(text), order_id), reply_markup=reply.remove)
+    await message.answer(texts.PAYMENT_INFO.format(amount, order_id), reply_markup=reply.remove)
     await message.answer(texts.PAYMENT, reply_markup=markup)
     await state.finish()
 

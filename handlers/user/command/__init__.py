@@ -3,7 +3,7 @@ from aiogram.dispatcher import Dispatcher
 
 from keyboards import callbacks
 
-from . import start, faq, today, bay
+from . import about, start, today, bay
 
 
 dispatcher = Dispatcher.get_current()
@@ -12,8 +12,8 @@ dispatcher = Dispatcher.get_current()
 dispatcher.register_message_handler(start.starting, CommandStart(), ChatTypeFilter('private'))
 
 #faq.py
-dispatcher.register_message_handler(faq.faq_group, Command('help'), ChatTypeFilter(('group', 'supergroup')))
-dispatcher.register_message_handler(faq.faq_user, Command('help'), ChatTypeFilter('private'))
+dispatcher.register_message_handler(about.about_bot_group, Command('help'), ChatTypeFilter(('group', 'supergroup')))
+dispatcher.register_message_handler(about.about_bot_user, Command('help'), ChatTypeFilter('private'))
 
 #today.py
 dispatcher.register_message_handler(today.date, Command('date'))

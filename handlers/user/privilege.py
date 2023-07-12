@@ -38,7 +38,9 @@ async def view(callback: types.CallbackQuery, callback_data: dict):
     markup.add(item1, item2)
 
     msg = texts.PRIVILEGE_INFO.format(
-        privilege.get('name'), ', '.join(privilege.get('scope')), privilege.get('price')
+        privilege.get('name'),
+        '\n'.join(map(lambda x: f'/{x}', privilege.get('scope'))),
+        privilege.get('price')
     )
     await callback.message.edit_text(msg, reply_markup=markup)
 

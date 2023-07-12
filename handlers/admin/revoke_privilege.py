@@ -13,7 +13,7 @@ db = DataBase(Config.DATABASE_URL)
 
 
 async def enter_user(message: types.Message):
-    await message.answer(texts.INPUT_USER, reply_markup=reply.cancel)
+    await message.answer(texts.INPUT_ENTITY, reply_markup=reply.cancel)
     await states.RevokePrivilege.user.set()
 
 async def revoke(message: types.Message, state: FSMContext):
@@ -33,10 +33,10 @@ async def revoke(message: types.Message, state: FSMContext):
             )
         ).first()
     else:
-        return await message.answer(texts.ERROR_INPUT_USER)
+        return await message.answer(texts.ERROR_INPUT_ENTITY)
 
     if entity is None:
-        return await message.answer(texts.USER_NOT_FOUND)
+        return await message.answer(texts.ENTITY_NOT_FOUND)
 
     if entity[0] > 0:
         db.update_by_id(models.User, entity[0], privilege='default')
