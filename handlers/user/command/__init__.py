@@ -1,9 +1,9 @@
-from aiogram.dispatcher.filters import CommandStart, Command, ChatTypeFilter
+from aiogram.dispatcher.filters import CommandStart, Command, ChatTypeFilter, Regexp
 from aiogram.dispatcher import Dispatcher
 
 from keyboards import callbacks
 
-from . import about, start, today, bay, kick
+from . import about, start, today, bay, kick, default
 
 
 dispatcher = Dispatcher.get_current()
@@ -25,3 +25,6 @@ dispatcher.register_message_handler(bay.bay_menu, Command('bay'))
 
 #kick.py
 dispatcher.register_message_handler(kick.kick_user, Command('kick'))
+
+#default.py
+dispatcher.register_message_handler(default.other_command, Regexp(r'^/(\w+)$'))
