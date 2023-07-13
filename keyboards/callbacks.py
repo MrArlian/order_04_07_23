@@ -3,6 +3,7 @@ from aiogram.utils.callback_data import CallbackData
 
 #User
 replenishment = CallbackData('replenishment')
+check_replenishment = CallbackData('check_replenishment', 'id')
 
 privilege = CallbackData('privilege', 'name', 'current_user')
 purchase_type = CallbackData('purchase_type', 'name', 'current_user')

@@ -5,9 +5,9 @@ from aiogram import types
 
 from yookassa import Configuration, Payment
 
+from keyboards import callbacks, reply
 from database import DataBase, models
 from modules import Config, tools
-from keyboards import reply
 from data import texts
 
 from .. import states
@@ -45,15 +45,36 @@ async def replenishment(message: types.Message, state: FSMContext):
         }
     })
 
-    markup = types.InlineKeyboardMarkup()
-    item = types.InlineKeyboardButton('Оплатить', url=payment.confirmation.confirmation_url)
-    markup.add(item)
+    markup = types.InlineKeyboardMarkup(row_width=1)
+    item1 = types.InlineKeyboardButton('Оплатить', url=payment.confirmation.confirmation_url)
+    item2 = types.InlineKeyboardButton('Проверить', callback_data=callbacks.check_replenishment.new(payment.id))
+    markup.add(item1, item2)
 
     db.add(models.Replenishment, order_id=order_id, user_id=user_id, amount=amount)
 
     await message.answer(texts.PAYMENT_INFO.format(amount, order_id), reply_markup=reply.remove)
     await message.answer(texts.PAYMENT, reply_markup=markup)
     await state.finish()
+
+async def check_replenishment(callback: types.CallbackQuery, callback_data: dict):
+
+    payment_id = callback_data.get('id')
+    user_id = callback.from_user.id
+
+    payment = Payment.find_one(payment_id=payment_id)
+
+
+    if payment.status == 'pending':
+        return await callback.answer(texts.NO_PAID)
+    if payment.status == 'canceled':
+        await callback.message.delete_reply_markup()
+        return await callback.message.answer(texts.CANCELED_PAYMENT)
+    
+    amount = float(payment.amount.value)
+
+    db.update_by_id(models.User, user_id, balance=models.User.balance + amount)
+    await callback.message.delete_reply_markup()
+    await callback.message.answer(texts.PAID.format(amount))
 
 async def cancel(message: types.Message, state: FSMContext):
     await message.answer(texts.ACTION_CANCELED, reply_markup=reply.remove)
