@@ -20,7 +20,7 @@ Bot.set_current(bot)
 def main() -> None:
     from handlers.middleware import CheckPrivilege, CheckAdminRole
 
-    dispatcher.setup_middleware(CheckAdminRole(('owner', 'super_user', 'user')))
+    dispatcher.setup_middleware(CheckAdminRole(('owner', 'super_user')))
     dispatcher.setup_middleware(CheckPrivilege())
 
     loop.create_task(
