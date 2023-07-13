@@ -21,13 +21,13 @@ async def bot_statistics(message: types.Message):
 
     replenishments = db.session.query(
         func.coalesce(func.sum(models.Replenishment.amount), 0),
-        func.sum(case(
+        func.coalesce(func.sum(case(
             [(
                 models.Replenishment.created_at.between(week, datetime.now()),
                 models.Replenishment.amount
             )],
             else_=0
-        ))
+        )), 0)
     ).filter(
         models.Replenishment.status == 'replenishment'
     ).first()
