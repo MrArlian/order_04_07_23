@@ -1,10 +1,11 @@
-ADMIN_KEYBOARD = [
+ADMIN_KEYBOARD = (
     'выдать',
     'забрать',
     'статистика'
-]
+)
 
-EXCLUDED_COMMANDS = [
+EXCLUDED_COMMANDS = (
     'bay',
+    'help',
     'admin'
-]
+)
