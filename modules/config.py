@@ -15,7 +15,7 @@ class _Config(BaseSettings):
     YOOMONEY_SHOP_ID: str
     YOOMONEY_API_KEY: str
 
-    CALLBACK_URL: str
+    RETURN_URL: str
 
     PRODUCTS_FILE: str = os.path.join(root_dir, 'data', 'products.json')
     ROOT_DIR: str = root_dir

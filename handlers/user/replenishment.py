@@ -37,7 +37,7 @@ async def replenishment(message: types.Message, state: FSMContext):
         },
         'confirmation': {
             'type': 'redirect',
-            'return_url': Config.CALLBACK_URL
+            'return_url': Config.RETURN_URL
         }
     })
 
