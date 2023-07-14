@@ -51,9 +51,16 @@ async def purchase_type(callback: types.CallbackQuery, callback_data: dict):
 
     user_id = callback.from_user.id
 
+    balance = db.get_data(models.User, columns=models.User.balance, default=0, id=user_id)
+    privilege = PRIVILEGES.get(name)
 
+
+    if privilege is None:
+        return await callback.answer(texts.PRIVILEGE_NOT_FOUND)
     if user_id != current_user:
         return await callback.answer(texts.ACTION_NOT_AVAILABLE, show_alert=True)
+    if balance < privilege.get('price'):
+        return await callback.answer(texts.INSUFFICIENT_FUNDS)
 
     markup = types.InlineKeyboardMarkup(row_width=1)
     markup.add(

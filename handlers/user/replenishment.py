@@ -1,5 +1,3 @@
-import random
-
 from aiogram.dispatcher.storage import FSMContext
 from aiogram import types
 
@@ -27,8 +25,6 @@ async def replenishment(message: types.Message, state: FSMContext):
     user_id = message.from_user.id
     text = message.text
 
-    order_id = random.getrandbits(32)
-
 
     if not tools.is_digit(text):
         return await message.answer(texts.INPUT_ERROR)
@@ -50,9 +46,9 @@ async def replenishment(message: types.Message, state: FSMContext):
     item2 = types.InlineKeyboardButton('Проверить', callback_data=callbacks.check_replenishment.new(payment.id))
     markup.add(item1, item2)
 
-    db.add(models.Replenishment, order_id=order_id, user_id=user_id, amount=amount)
+    db.add(models.Replenishment, order_id=payment.id, user_id=user_id, amount=amount)
 
-    await message.answer(texts.PAYMENT_INFO.format(amount, order_id), reply_markup=reply.remove)
+    await message.answer(texts.PAYMENT_INFO.format(amount, payment.id), reply_markup=reply.remove)
     await message.answer(texts.PAYMENT, reply_markup=markup)
     await state.finish()
 
@@ -62,6 +58,8 @@ async def check_replenishment(callback: types.CallbackQuery, callback_data: dict
     user_id = callback.from_user.id
 
     payment = Payment.find_one(payment_id=payment_id)
+    data = tools.get_privilege(Config.PRODUCTS_FILE)
+    markup = types.InlineKeyboardMarkup()
 
 
     if payment.status == 'pending':
@@ -69,12 +67,27 @@ async def check_replenishment(callback: types.CallbackQuery, callback_data: dict
     if payment.status == 'canceled':
         await callback.message.delete_reply_markup()
         return await callback.message.answer(texts.CANCELED_PAYMENT)
-    
-    amount = float(payment.amount.value)
 
-    db.update_by_id(models.User, user_id, balance=models.User.balance + amount)
+    markup.add(types.InlineKeyboardButton(
+        text='Пополнить баланс',
+        callback_data=callbacks.replenishment.new()
+    ))
+    markup.inline_keyboard.append([])
+
+    for key, value in data.items():
+        if key == 'default':
+            continue
+
+        markup.insert(types.InlineKeyboardButton(
+            text=value.get('name'),
+            callback_data=callbacks.privilege.new(key, user_id)
+        ))
+
+    db.update(models.Replenishment, models.Replenishment.order_id == payment_id, status='replenishment')
+    db.update_by_id(models.User, user_id, balance=models.User.balance + payment.amount.value)
+
     await callback.message.delete_reply_markup()
-    await callback.message.answer(texts.PAID.format(amount))
+    await callback.message.answer(texts.PAID.format(payment.amount.value), reply_markup=markup)
 
 async def cancel(message: types.Message, state: FSMContext):
     await message.answer(texts.ACTION_CANCELED, reply_markup=reply.remove)

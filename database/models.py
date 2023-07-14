@@ -1,4 +1,5 @@
 from sqlalchemy.schema import Column, ForeignKey, CheckConstraint, Identity
+from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy import types
 from sqlalchemy import func
 
@@ -32,7 +33,7 @@ class Replenishment(base.BaseModel):
     __tablename__ = 'replenishment'
 
     id: base.Integer = Column(types.BigInteger, Identity(True, start=1, increment=1), nullable=False, primary_key=True)
-    order_id: base.String = Column(types.String, nullable=False)
+    order_id: base.UUID = Column(UUID(as_uuid=True), nullable=False)
     user_id: base.Integer = Column(types.BigInteger, ForeignKey('users.id'), nullable=False)
     amount: base.Float = Column(types.Numeric(7, 2, asdecimal=False), nullable=False)
     status: base.String = Column(types.String, default='wait')
