@@ -1,4 +1,7 @@
 import itertools
+import re
+
+from datetime import datetime
 
 from aiogram.dispatcher.middlewares import BaseMiddleware
 from aiogram.dispatcher.handler import CancelHandler
@@ -27,8 +30,8 @@ class CheckPrivilege(BaseMiddleware):
         chat_type = message.chat.type
         chat_id = message.chat.id
 
-        command = text.split('/', maxsplit=1)[-1]
-
+        match_command = re.search(r'(?<=\/)(\w*?)(?=@|$)', text, re.IGNORECASE)
+        command = match_command.group() if match_command is not None else None
 
         if command in CHECK_COMMANDS and command not in settings.EXCLUDED_COMMANDS:
             if chat_type in ('group', 'supergroup'):
@@ -37,29 +40,35 @@ class CheckPrivilege(BaseMiddleware):
                 await self._check_user_privilege(user_id, command)
 
     async def _check_user_privilege(self, user_id: int, command: str) -> None:
-        user_privilege = db.get_data(models.User, columns=models.User.privilege, id=user_id)
+        user = db.get_data(models.User, id=user_id)
 
-        if self._check_command_privilege(user_privilege, command):
-            return
+        now = datetime.now()
 
-        await bot.send_message(user_id, texts.COMMAND_NOT_AVAILABLE)
-        raise CancelHandler
+        if user.expires_in <= now:
+            await bot.send_message(user_id, texts.COMMAND_NOT_AVAILABLE)
+            raise CancelHandler
+        if not self._check_command_privilege(user.privilege, command):
+            await bot.send_message(user_id, texts.COMMAND_NOT_AVAILABLE)
+            raise CancelHandler
 
     async def _check_group_privilege(self, group_id: int, user_id: int, command: str) -> None:
-        group_privilege = db.get_data(models.Group, columns=models.Group.privilege, id=group_id)
-        user_privilege = db.get_data(models.User, columns=models.User.privilege, id=user_id)
+        group = db.get_data(models.Group, id=group_id)
+        user = db.get_data(models.User, id=user_id)
 
-        if (
-            self._check_command_privilege(group_privilege, command) or
-            self._check_command_privilege(user_privilege, command)
-        ):
-            return
+        now = datetime.now()
 
-        if user_privilege is None:
+        if user is None:
             await bot.send_message(group_id, texts.START_BOT)
-        else:
+            raise CancelHandler
+        if group.expires_in <= now and user.expires_in <= now:
             await bot.send_message(group_id, texts.COMMAND_NOT_AVAILABLE)
-        raise CancelHandler
+            raise CancelHandler
+        if (
+            not self._check_command_privilege(group.privilege, command) or
+            not self._check_command_privilege(user.privilege, command)
+        ):
+            await bot.send_message(group_id, texts.COMMAND_NOT_AVAILABLE)
+            raise CancelHandler
 
     def _check_command_privilege(self, privilege: str, command: str) -> bool:
         data = PRIVILEGES.get(privilege)
