@@ -29,6 +29,12 @@ ABOUT_BOT_FOR_USER = (
 
 CHOOSE_PRIVILEGE = 'Выберите подписку.'
 
+DETAILS_PRIVILEGE = (
+    'Ваша подписка: {:s}\n'
+    'Время действия до: {:s}\n\n'
+    'Выберите подписку.'
+)
+
 PRIVILEGE_NOT_FOUND = 'Оооупс. Подписка не найдена.'
 
 PRIVILEGE_INFO = (
@@ -79,6 +85,10 @@ ERROR_KICK_PARAMS = (
 ERROR_KICK_PARAM_ID = 'Используйте только числа в качестве ID!'
 
 USER_NOT_FOUND = 'Пользователь не найден!'
+
+USER_PRIVILEGE_TIME_EXPIRED = 'Время действия вашей подписки истекло!'
+
+GROUP_PRIVILEGE_TIME_EXPIRED = 'Время действия подписки в группе истекло!'
 
 
 #Admin

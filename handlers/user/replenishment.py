@@ -4,13 +4,15 @@ from aiogram import types
 
 from yookassa import Configuration, Payment
 
-from keyboards import callbacks, reply
+from keyboards import callbacks, reply, generated
 from database import DataBase, models
 from modules import Config, tools
 from data import texts
 
 from .. import states
 
+
+PRIVILEGE = tools.get_privilege()
 
 Configuration.configure(Config.YOOMONEY_SHOP_ID, Config.YOOMONEY_API_KEY)
 db = DataBase(Config.DATABASE_URL)
@@ -85,8 +87,6 @@ async def check_replenishment(callback: types.CallbackQuery, callback_data: dict
     user_id = callback.from_user.id
 
     payment = Payment.find_one(payment_id=payment_id)
-    data = tools.get_privilege(Config.PRODUCTS_FILE)
-    markup = types.InlineKeyboardMarkup()
 
 
     if user_id != current_user:
@@ -97,28 +97,14 @@ async def check_replenishment(callback: types.CallbackQuery, callback_data: dict
         await callback.message.delete_reply_markup()
         return await callback.message.answer(texts.CANCELED_PAYMENT)
 
-    markup.add(
-        types.InlineKeyboardButton(
-            text='Пополнить баланс',
-            callback_data=callbacks.replenishment.new(user_id)
-        )
-    )
-    markup.inline_keyboard.append([])
-
-    for key, value in data.items():
-        if key == 'default':
-            continue
-
-        markup.insert(types.InlineKeyboardButton(
-            text=value.get('name'),
-            callback_data=callbacks.privilege.new(key, user_id)
-        ))
-
     db.update(models.Replenishment, models.Replenishment.order_id == payment_id, status='replenishment')
     db.update_by_id(models.User, user_id, balance=models.User.balance + payment.amount.value)
 
     await callback.message.delete_reply_markup()
-    await callback.message.answer(texts.PAID.format(payment.amount.value), reply_markup=markup)
+    await callback.message.answer(
+        text=texts.PAID.format(payment.amount.value),
+        reply_markup=generated.buy_menu_keyboard(user_id, PRIVILEGE)
+    )
 
 async def cancel(message: types.Message, state: FSMContext):
     await message.answer(texts.ACTION_CANCELED, reply_markup=reply.remove)

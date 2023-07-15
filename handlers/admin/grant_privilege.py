@@ -9,7 +9,7 @@ from data import texts
 from .. import states
 
 
-PRIVILEGES = tools.get_privilege(Config.PRODUCTS_FILE)
+PRIVILEGES = tools.get_privilege()
 
 db = DataBase(Config.DATABASE_URL)
 

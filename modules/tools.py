@@ -1,7 +1,10 @@
+import functools
 import typing
 import json
 import re
 import os
+
+from .config import config
 
 
 def is_digit(string: str, *, only_integer: bool = False) -> bool:
@@ -18,17 +21,16 @@ def is_username(string: str) -> bool:
     """
     return bool(re.match(r'^@?[a-z0-9_]{5,32}$', string, flags=re.IGNORECASE))
 
-def get_privilege(path: str, privileg: typing.Optional[str] = None) -> typing.Dict[str, dict]:
+@functools.cache
+def get_privilege(privileg: typing.Optional[str] = None) -> typing.Dict[str, dict]:
     """
         Gets privileges or privilege depends on whether name is passed.
 
-        :params path: Path to json file.
         :params privileg: Privilege name.
     """
-    if not os.path.isfile(path):
-        return {}
+    assert os.path.isfile(config.PRODUCTS_FILE), 'Privilege file not found!'
 
-    with open(path, 'r', encoding='utf-8') as file:
+    with open(config.PRODUCTS_FILE, 'r', encoding='utf-8') as file:
         data = json.load(file)
 
     if privileg is None:

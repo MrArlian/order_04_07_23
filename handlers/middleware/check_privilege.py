@@ -12,7 +12,7 @@ from modules import Config, tools
 from data import settings, texts
 
 
-PRIVILEGES = tools.get_privilege(Config.PRODUCTS_FILE)
+PRIVILEGES = tools.get_privilege()
 CHECK_COMMANDS = set(itertools.chain.from_iterable(
     _privilege.get('scope') for _privilege in PRIVILEGES.values()
 ))

@@ -16,7 +16,7 @@ class User(base.BaseModel):
     username: base.String = Column(types.String, nullable=False)
     balance: base.Float = Column(types.Numeric(7, 2, asdecimal=False), CheckConstraint('balance >= 0'), default=0)
     privilege: base.String = Column(types.String, default='default')
-    expires_in: base.String = Column(types.DateTime, default=datetime.min)
+    expires_in: base.DateTime = Column(types.DateTime, default=datetime.min)
     registration: base.DateTime = Column(types.DateTime, default=func.now())
     role: base.String = Column(types.String, default='user')
 
@@ -28,7 +28,7 @@ class Group(base.BaseModel):
     id: base.Integer = Column(types.BigInteger, nullable=False, primary_key=True)
     username: base.String = Column(types.String, nullable=False)
     privilege: base.String = Column(types.String, default='default')
-    expires_in: base.String = Column(types.DateTime, default=datetime.min)
+    expires_in: base.DateTime = Column(types.DateTime, default=datetime.min)
     registration: base.DateTime = Column(types.DateTime, default=func.now())
 
 

@@ -14,6 +14,8 @@ dispatcher.register_callback_query_handler(privilege.view, callbacks.privilege.f
 dispatcher.register_callback_query_handler(privilege.purchase_type, callbacks.purchase_type.filter())
 dispatcher.register_callback_query_handler(privilege.purchase, callbacks.bay_privilege.filter())
 
+dispatcher.register_callback_query_handler(privilege.back_bay_menu, callbacks.back_bay.filter())
+
 #replenishment.py
 dispatcher.register_callback_query_handler(replenishment.enter_amount, callbacks.replenishment.filter())
 dispatcher.register_message_handler(replenishment.cancel, Text('отмена', ignore_case=True), state=states.Replenishment)

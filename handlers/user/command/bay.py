@@ -1,41 +1,37 @@
-import typing
-
 from aiogram import types
 
+from database import DataBase, models
 from modules import Config, tools
-from keyboards import callbacks
+from keyboards import generated
 from data import texts
 
 
-async def bay_menu(event: typing.Union[types.Message, types.CallbackQuery],
-                   callback_data: typing.Optional[dict] = None):
+PRIVILEGE = tools.get_privilege()
 
-    user_id = event.from_user.id
+db = DataBase(Config.DATABASE_URL)
 
-    data = tools.get_privilege(Config.PRODUCTS_FILE)
 
-    markup = types.InlineKeyboardMarkup()
-    markup.add(
-        types.InlineKeyboardButton(
-            text='Пополнить баланс',
-            callback_data=callbacks.replenishment.new(user_id)
-        )
-    )
-    markup.inline_keyboard.append([])
+async def bay_menu(message: types.Message):
 
-    for key, value in data.items():
-        if key == 'default':
-            continue
+    user_id = message.from_user.id
+    chat_type = message.chat.type
+    chat_id = message.chat.id
 
-        markup.insert(types.InlineKeyboardButton(
-            text=value.get('name'),
-            callback_data=callbacks.privilege.new(key, user_id)
-        ))
-
-    if isinstance(event, types.Message):
-        await event.answer(texts.CHOOSE_PRIVILEGE, reply_markup=markup)
+    if chat_type == 'private':
+        entity = db.get_data(models.User, id=user_id)
     else:
-        if user_id != int(callback_data.get('current_user')):
-            return await event.answer(texts.ACTION_NOT_AVAILABLE, show_alert=True)
+        entity = db.get_data(models.Group, id=chat_id)
 
-        await event.message.edit_text(texts.CHOOSE_PRIVILEGE, reply_markup=markup)
+    if entity.privilege != 'default':
+        await message.answer(
+            text=texts.DETAILS_PRIVILEGE.format(
+                PRIVILEGE[entity.privilege]['name'],
+                entity.expires_in.strftime('%Y-%m-%d %H:%M:%S')
+            ),
+            reply_markup=generated.buy_menu_keyboard(user_id, PRIVILEGE)
+        )
+    else:
+        await message.answer(
+            text=texts.CHOOSE_PRIVILEGE,
+            reply_markup=generated.buy_menu_keyboard(user_id, PRIVILEGE)
+        )
