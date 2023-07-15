@@ -1,4 +1,5 @@
 from aiogram.dispatcher.storage import FSMContext
+from aiogram.utils.markdown import hlink
 from aiogram import types
 
 from yookassa import Configuration, Payment
@@ -15,9 +16,27 @@ Configuration.configure(Config.YOOMONEY_SHOP_ID, Config.YOOMONEY_API_KEY)
 db = DataBase(Config.DATABASE_URL)
 
 
-async def enter_amount(callback: types.CallbackQuery):
+async def enter_amount(callback: types.CallbackQuery, callback_data: dict):
+
+    current_user = int(callback_data.get('current_user'))
+    first_name = callback.from_user.first_name
+    username = callback.from_user.username
+    user_id = callback.from_user.id
+
+
+    if user_id != current_user:
+        return await callback.answer(texts.ACTION_NOT_AVAILABLE, show_alert=True)
+
+    if username is None:
+        user_link = hlink(f'@{first_name}', f'tg://user?id={user_id}')
+    else:
+        user_link = f'@{username}'
+
     await callback.message.delete_reply_markup()
-    await callback.message.answer(texts.ENTER_REPLENISHMENT_AMOUNT, reply_markup=reply.cancel)
+    await callback.message.answer(
+        text=texts.ENTER_REPLENISHMENT_AMOUNT.format(user_link),
+        reply_markup=reply.cancel
+    )
     await states.Replenishment.amount.set()
 
 async def replenishment(message: types.Message, state: FSMContext):
@@ -42,9 +61,16 @@ async def replenishment(message: types.Message, state: FSMContext):
     })
 
     markup = types.InlineKeyboardMarkup(row_width=1)
-    item1 = types.InlineKeyboardButton('Оплатить', url=payment.confirmation.confirmation_url)
-    item2 = types.InlineKeyboardButton('Проверить', callback_data=callbacks.check_replenishment.new(payment.id))
-    markup.add(item1, item2)
+    markup.add(
+        types.InlineKeyboardButton(
+            text='Оплатить',
+            url=payment.confirmation.confirmation_url
+        ),
+        types.InlineKeyboardButton(
+            text='Проверить',
+            callback_data=callbacks.check_replenishment.new(payment.id, user_id)
+        )
+    )
 
     db.add(models.Replenishment, order_id=payment.id, user_id=user_id, amount=amount)
 
@@ -54,6 +80,7 @@ async def replenishment(message: types.Message, state: FSMContext):
 
 async def check_replenishment(callback: types.CallbackQuery, callback_data: dict):
 
+    current_user = int(callback_data.get('current_user'))
     payment_id = callback_data.get('id')
     user_id = callback.from_user.id
 
@@ -62,16 +89,20 @@ async def check_replenishment(callback: types.CallbackQuery, callback_data: dict
     markup = types.InlineKeyboardMarkup()
 
 
+    if user_id != current_user:
+        return await callback.answer(texts.ACTION_NOT_AVAILABLE, show_alert=True)
     if payment.status == 'pending':
         return await callback.answer(texts.NO_PAID)
     if payment.status == 'canceled':
         await callback.message.delete_reply_markup()
         return await callback.message.answer(texts.CANCELED_PAYMENT)
 
-    markup.add(types.InlineKeyboardButton(
-        text='Пополнить баланс',
-        callback_data=callbacks.replenishment.new()
-    ))
+    markup.add(
+        types.InlineKeyboardButton(
+            text='Пополнить баланс',
+            callback_data=callbacks.replenishment.new(user_id)
+        )
+    )
     markup.inline_keyboard.append([])
 
     for key, value in data.items():

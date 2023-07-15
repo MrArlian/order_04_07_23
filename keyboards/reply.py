@@ -6,6 +6,7 @@ remove = ReplyKeyboardRemove()
 #User
 cancel = ReplyKeyboardMarkup(
     resize_keyboard=True,
+    selective=True,
     keyboard=[
         [
             KeyboardButton('Отмена')

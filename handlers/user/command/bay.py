@@ -10,23 +10,18 @@ from data import texts
 async def bay_menu(event: typing.Union[types.Message, types.CallbackQuery],
                    callback_data: typing.Optional[dict] = None):
 
-    if isinstance(event, types.CallbackQuery):
-        chat_type = event.message.chat.type
-        user_id = event.from_user.id
-    else:
-        user_id = event.from_user.id
-        chat_type = event.chat.type
+    user_id = event.from_user.id
 
     data = tools.get_privilege(Config.PRODUCTS_FILE)
+
     markup = types.InlineKeyboardMarkup()
-
-
-    if chat_type == 'private':
-        markup.add(types.InlineKeyboardButton(
+    markup.add(
+        types.InlineKeyboardButton(
             text='Пополнить баланс',
-            callback_data=callbacks.replenishment.new()
-        ))
-        markup.inline_keyboard.append([])
+            callback_data=callbacks.replenishment.new(user_id)
+        )
+    )
+    markup.inline_keyboard.append([])
 
     for key, value in data.items():
         if key == 'default':
