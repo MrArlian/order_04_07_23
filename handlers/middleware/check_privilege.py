@@ -64,8 +64,8 @@ class CheckPrivilege(BaseMiddleware):
             await bot.send_message(group_id, texts.COMMAND_NOT_AVAILABLE)
             raise CancelHandler
         if (
-            not self._check_command_privilege(group.privilege, command) or
-            not self._check_command_privilege(user.privilege, command)
+            not self._check_command_privilege(user.privilege, command) and
+            not self._check_command_privilege(group.privilege, command)
         ):
             await bot.send_message(group_id, texts.COMMAND_NOT_AVAILABLE)
             raise CancelHandler
