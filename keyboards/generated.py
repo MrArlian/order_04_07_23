@@ -17,9 +17,6 @@ def buy_menu_keyboard(user_id: int, privilege: typing.List[dict]) -> InlineKeybo
     markup.inline_keyboard.append([])
 
     for key, value in privilege.items():
-        if key == 'default':
-            continue
-
         markup.insert(
             InlineKeyboardButton(
                 text=value['name'],

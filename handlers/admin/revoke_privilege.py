@@ -1,5 +1,5 @@
 from aiogram.dispatcher.storage import FSMContext
-from aiogram import types
+from aiogram import Bot, types
 
 from database import DataBase, models
 from modules import Config, tools
@@ -10,6 +10,7 @@ from .. import states
 
 
 db = DataBase(Config.DATABASE_URL)
+bot = Bot.get_current()
 
 
 async def enter_user(message: types.Message):
@@ -40,8 +41,10 @@ async def revoke(message: types.Message, state: FSMContext):
 
     if entity[0] > 0:
         db.update_by_id(models.User, entity[0], privilege='default')
+        await bot.send_message(entity[0], texts.PRIVILEGE_REVOKED_USER)
     else:
         db.update_by_id(models.Group, entity[0], privilege='default')
+        await bot.send_message(entity[0], texts.PRIVILEGE_REVOKED_GROUP)
 
     await message.answer(texts.PRIVILEGE_REVOKED, reply_markup=reply.admin_menu)
     await state.finish()

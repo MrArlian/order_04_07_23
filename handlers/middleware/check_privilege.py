@@ -12,9 +12,9 @@ from modules import Config, tools
 from data import settings, texts
 
 
-PRIVILEGES = tools.get_privilege()
+PRIVILEGE = tools.get_privilege()
 CHECK_COMMANDS = set(itertools.chain.from_iterable(
-    _privilege.get('scope') for _privilege in PRIVILEGES.values()
+    _privilege.get('scope') for _privilege in PRIVILEGE.values()
 ))
 
 db = DataBase(Config.DATABASE_URL)
@@ -71,7 +71,7 @@ class CheckPrivilege(BaseMiddleware):
             raise CancelHandler
 
     def _check_command_privilege(self, privilege: str, command: str) -> bool:
-        data = PRIVILEGES.get(privilege)
+        data = PRIVILEGE.get(privilege)
 
         if data and command in data['scope']:
             return True

@@ -26,7 +26,7 @@ async def bay_menu(message: types.Message):
         await message.answer(
             text=texts.DETAILS_PRIVILEGE.format(
                 PRIVILEGE[entity.privilege]['name'],
-                entity.expires_in.strftime('%Y-%m-%d %H:%M:%S')
+                entity.expires_in
             ),
             reply_markup=generated.buy_menu_keyboard(user_id, PRIVILEGE)
         )

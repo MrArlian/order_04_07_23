@@ -17,7 +17,7 @@ async def bot_statistics(message: types.Message):
     group_count = db.counter(models.Group)
     user_count = db.counter(models.User)
 
-    week = datetime.now() + timedelta(days=7)
+    week = datetime.now() - timedelta(days=7)
 
     replenishments = db.session.query(
         func.coalesce(func.sum(models.Replenishment.amount), 0),

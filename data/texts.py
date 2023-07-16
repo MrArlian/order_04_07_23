@@ -31,7 +31,7 @@ CHOOSE_PRIVILEGE = 'Выберите подписку.'
 
 DETAILS_PRIVILEGE = (
     'Ваша подписка: {:s}\n'
-    'Время действия до: {:s}\n\n'
+    'Время действия до: {:%Y-%m-%d %H:%M:%S}\n\n'
     'Выберите подписку.'
 )
 
@@ -100,13 +100,21 @@ ERROR_INPUT_ENTITY = 'Неверный ID или username.'
 
 ENTITY_NOT_FOUND = 'Пользователь или группа не найдены.'
 
-INPUT_PRIVILEGE_NAME = 'Введите имя подписки.'
+INPUT_PRIVILEGE_NAME = 'Введите имя подписки.\nДоступные имена: {:s}'
 
 ADMIN_PRIVILEGE_NOT_FOUND = 'Подписка не найдена.'
 
 PRIVILEGE_GRANTED = 'Подписка выдана'
 
+PRIVILEGE_GRANTED_USER = 'Вам выдана подписка {:s}'
+
+PRIVILEGE_GRANTED_GROUP = 'Греппе выдана подписка {:s}'
+
 PRIVILEGE_REVOKED = 'Подписка отозвана.'
+
+PRIVILEGE_REVOKED_USER = 'У вас отозвана подписка.'
+
+PRIVILEGE_REVOKED_GROUP = 'У группы отозвана подписка.'
 
 ACTION_CANCELED = 'Действие отменено.'
 
